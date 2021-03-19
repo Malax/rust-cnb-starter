@@ -5,6 +5,9 @@ It targets `x86_64-unknown-linux-musl` as the platform for the buildpack and com
 cross-compilation on macOS. It uses [libcnb](https://github.com/malax/libcnb) as the language binding for buildpacks.
 
 ## Requirements
+
+- [rustup](https://rustup.rs/)
+- `rustup target add x86_64-unknown-linux-musl`
 - [cargo-make](https://github.com/sagiegurari/cargo-make): `cargo install cargo-make`
 
 ### macOS
