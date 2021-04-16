@@ -13,6 +13,12 @@ cross-compilation on macOS. It uses [libcnb](https://github.com/malax/libcnb) as
 ### macOS
 - [homebrew-musl-cross](https://github.com/FiloSottile/homebrew-musl-cross): `brew install FiloSottile/musl-cross/musl-cross`
 
+### Ubuntu
+
+```
+$ sudo apt install musl-tools
+```
+
 ## Usage
 Copy this repository and make the necessary changes for your buildpack. To build and run the buildpack:
 
