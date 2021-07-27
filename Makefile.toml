@@ -69,27 +69,43 @@ use colored::*;
 use std::path::PathBuf;
 use std::fs;
 use std::collections::HashMap;
+use std::path::Path;
 
 fn main() {
     let destination = PathBuf::from("target/buildpack");
+
+    std::fs::remove_dir_all(&destination).unwrap();
+
     if !destination.exists() {
         fs::create_dir_all(&destination.join("bin")).unwrap();
     }
 
-    let mut files = HashMap::new();
-    files.insert(PathBuf::from("./target/x86_64-unknown-linux-musl/debug/bp_detect"), destination.join("bin/detect"));
-    files.insert(PathBuf::from("./target/x86_64-unknown-linux-musl/debug/bp_build"), destination.join("bin/build"));
-    files.insert(PathBuf::from("./buildpack.toml"), destination.join("buildpack.toml"));
+    let bin_name = find_binary(PathBuf::from("./target/x86_64-unknown-linux-musl/debug")).unwrap().unwrap();
 
-    for (from, to) in &files {
-        fs::copy(from, to).unwrap();
-    }
+    fs::copy(&bin_name, destination.join("bin/build")).unwrap();
+    fs::hard_link(destination.join("bin/build"), destination.join("bin/detect")).unwrap();
+    fs::copy(PathBuf::from("./buildpack.toml"), destination.join("buildpack.toml")).unwrap();
 
     println!("{}", "Successfully created buildpack directory".bold().green());
     println!("{}", "========================================".bold().green());
     println!("To try out your buildpack run:");
     println!("$ pack build rust-cnb-starter -b {} --path {}", destination.to_str().unwrap().bold(), "$APP_DIR".bold());
     println!("");
+}
+
+
+fn find_binary(path: impl AsRef<Path>) -> Result<Option<PathBuf>, std::io::Error> {
+    use std::os::unix::fs::MetadataExt;
+
+    for dir_entry in std::fs::read_dir(path.as_ref())?.into_iter() {
+        let dir_entry = dir_entry?;
+        let meta = dir_entry.metadata()?;
+        if meta.is_file() && meta.mode() & 0o100 == 0o100 {
+            return Ok(Some(dir_entry.path()));
+        }
+    }
+
+    Ok(None)
 }
 '''
 
