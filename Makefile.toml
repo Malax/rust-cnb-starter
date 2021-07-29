@@ -74,11 +74,11 @@ use std::path::Path;
 fn main() {
     let destination = PathBuf::from("target/buildpack");
 
-    std::fs::remove_dir_all(&destination).unwrap();
-
-    if !destination.exists() {
-        fs::create_dir_all(&destination.join("bin")).unwrap();
+    if destination.exists() {
+        std::fs::remove_dir_all(&destination).unwrap();
     }
+
+    fs::create_dir_all(&destination.join("bin")).unwrap();
 
     let bin_name = find_binary(PathBuf::from("./target/x86_64-unknown-linux-musl/debug")).unwrap().unwrap();
 
